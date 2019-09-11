@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="main-navbar sticky-top bg-white">
+        <div v-if="user" class="main-navbar sticky-top bg-white">
             <!-- Main Navbar -->
             <nav class="navbar align-items-stretch navbar-light flex-md-nowrap p-0">
                 <form action="#" class="main-navbar__search w-100 d-none d-md-flex d-lg-flex">

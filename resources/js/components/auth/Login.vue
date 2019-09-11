@@ -27,7 +27,8 @@
                             </div>
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox mb-1">
-                                    <input v-model="form.remember" type="checkbox" name="remember" class="custom-control-input" id="formsCheckboxChecked">
+                                    <input v-model="form.remember" type="checkbox" name="remember"
+                                           class="custom-control-input" id="formsCheckboxChecked">
                                     <label class="custom-control-label" for="formsCheckboxChecked">Remember me</label>
                                 </div>
                             </div>
@@ -68,14 +69,21 @@
         },
         methods: {
             login() {
-                // Submit the form via a POST request
+                this.$Progress.start()
                 this.form.post('/login')
                     .then(({data}) => {
                         Fire.$emit('LoadUser');
+                        this.$Progress.finish()
                         this.$router.push('/');
-                    });
+                    })
+                    .catch(() => {
+                        this.$Progress.fail();
+                    })
             },
-        }
+        },
+        created() {
+            Fire.$emit('LoadUser');
+        },
     }
 </script>
 

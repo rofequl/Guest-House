@@ -14,6 +14,7 @@ import CreditReport from './components/report/CreditReport'
 import DebitReport from './components/report/DebitReport'
 import PaymentReport from './components/report/PaymentReport'
 import BalanceSheet from './components/report/BalanceSheet'
+import BookingView from './components/booking/BookingView'
 
 export const routes = [
     {
@@ -79,5 +80,9 @@ export const routes = [
     {
         path: '/balance-sheet',
         component: BalanceSheet
+    },
+    {
+        path: '/booking-view/:id',
+        component: BookingView
     }
 ];

@@ -29,6 +29,7 @@ Route::apiResources([
 
 Route::post('room-type-setup', 'API\RoomController@RoomTypeStore');
 Route::get('room-type', 'API\RoomController@RoomType');
+Route::get('room-info', 'API\RoomController@RoomInfo');
 Route::get('room-type-booking/{data}', 'API\RoomController@RoomTypeBooking');
 
 Route::get('income-source-all', 'API\IncomesourceController@IncomeSourceAll');
@@ -54,6 +55,7 @@ Route::get('total-balance-sheet', 'API\ReportController@TotalBalanceSheet');
 
 Route::get('member/{data}', 'API\BookingController@member');
 Route::get('booking-amount', 'API\BookingController@BookingAmount');
+Route::post('booking-room-free', 'API\BookingController@BookingRoomFree');
 Route::get('booking-all-schedule', 'API\BookingController@BookingAllSchedule');
 Route::post('booking-schedule-search', 'API\BookingController@BookingScheduleSearch');
 

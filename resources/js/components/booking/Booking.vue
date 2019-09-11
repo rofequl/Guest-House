@@ -148,6 +148,9 @@
                     }
                 })
             },
+            bookingView(id){
+                this.$router.push('booking-view/'+id);
+            }
         },
         created() {
             this.loadBookings();

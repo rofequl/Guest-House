@@ -54,7 +54,19 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 const app = new Vue({
     el: '#app',
     router,
+    ready: function () {
+        this.fetchTips();
+    },
+    methods: {
+        fetchTips: function () {
+            this.$http.get('/api/tips', function (tips) {
+                this.$set('tips', tips)
+            });
+        }
+
+    }
 });
+
 
 jQuery.extend(true, jQuery.fn.datetimepicker.defaults, {
     icons: {

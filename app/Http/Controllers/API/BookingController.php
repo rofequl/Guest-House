@@ -102,6 +102,41 @@ class BookingController extends Controller
         $credit1->save();
 
     }
+    public function BookingRoomFree(Request $request)
+    {
+        $this->validate($request, [
+            'room_type_id' => 'Required|integer',
+            'booking_from' => "Required",
+            'booking_to' => "Required",
+        ]);
+
+        $date1 = new Carbon(DateTime::createFromFormat('d/m/Y', $request->booking_from)->format('Y-m-d'));
+        $date2 = new Carbon(DateTime::createFromFormat('d/m/Y', $request->booking_to)->format('Y-m-d'));
+        $difference = $date1->diff($date2)->days + 1;
+
+        $room_info = room_info::where('room_type_id', $request->room_type_id)->first();
+        $room_qty = $room_info->qty;
+
+        if ($difference == 1) {
+            //$room_qty = $room_qty - booking::whereDate('booking_from', $date1)->get()->sum('room_qty');
+            $room_qty = $room_qty - booking::whereDate('booking_from', '<=', $date1)->where('room_type_id', $request->room_type_id)
+                    ->whereDate('booking_to', '>=', $date1)->get()->sum('room_qty');
+        } else {
+            $room_qty = $room_qty - booking::whereDate('booking_from', '>=', $date1)->where('room_type_id', $request->room_type_id)
+                    ->whereDate('booking_to', '<=', $date2)->get()->sum('room_qty');
+            $room_qty = $room_qty - booking::whereDate('booking_from', '<=', $date2)->where('room_type_id', $request->room_type_id)
+                    ->whereDate('booking_to', '>', $date2)->get()->sum('room_qty');
+            $room_qty = $room_qty - booking::whereDate('booking_from', '<', $date1)->whereDate('booking_to', '>=', $date1)->where('room_type_id', $request->room_type_id)
+                    ->whereDate('booking_to', '<', $date2)->get()->sum('room_qty');
+        }
+
+        return $room_qty;
+
+        //return response()->json(['room_qty' => 'The Message'], 422);
+
+        //dd($request->all());
+
+    }
 
     public function show($id)
     {

@@ -48,6 +48,11 @@ class RoomController extends Controller
         return room_type::latest()->get();
     }
 
+    public function RoomInfo()
+    {
+        return room_info::with('room_type')->select('id','room_type_id')->latest()->get();
+    }
+
     public function RoomTypeStore(Request $request)
     {
         $this->validate($request, [

@@ -21,32 +21,40 @@
                 <div v-if="!roomTypesInfo" class="card card-small mb-4 pt-3">
                     <div class="card-header border-bottom text-center">
                         <h4 class="mb-0">Room Information</h4>
-                        <i id="roomTypeDetailsError" class="material-icons d-none" style="font-size:53px">
-                            error_outline
-                        </i>
-                        <span id="roomTypeDetails"
-                              class="text-muted d-block mb-2">Select room type see the information.</span>
+                        <span class="text-muted d-block mb-2">Select room type see the information.</span>
                         <router-link to="/room-setup" class="mb-2 btn btn-sm btn-pill btn-outline-primary mr-2"><i
                             class="material-icons">&#xE917;</i> Room Setup
                         </router-link>
                     </div>
                 </div>
                 <div v-if="roomTypesInfo" class="card card-small mb-4 pt-3">
-                    <div class="card-header border-bottom text-center">
+                    <div class="card-header border-bottom text-left">
                         <div class="mb-3 mx-auto">
                             <img class="rounded" :src="'image/room/'+roomInfo.image" alt="Image" width="100%">
                         </div>
-                        <h4 class="mb-0">{{roomInfo.room_type.room_type}}</h4>
-                        <span class="text-muted d-block mb-2">Rent: {{roomInfo.rent}}</span>
+                        <div class="row text-left">
+                            <div class="col-md-7">
+                                <h6 style="font-size: 13px;" class="mb-0">Room Type:
+                                    {{roomInfo.room_type.room_type}}</h6>
+                                <h6 style="font-size: 13px;" class="mb-0">Room Rent: {{roomInfo.rent}}</h6>
+                            </div>
+                            <div class="col-md-5">
+                                <h6 style="font-size: 13px;" class="mb-0">Book: <span id="roomTypeQtyBook">0</span></h6>
+                                <h6 style="font-size: 13px;" class="mb-0">Empty: <span id="roomTypeQtyEmpty">0</span>
+                                </h6>
+                            </div>
+                        </div>
+                        <h6 class="mb-0">Details: </h6>
+                        <span class="text-muted d-block mb-2">{{roomInfo.details}}</span>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item px-4">
                             <div class="progress-wrapper">
-                                <strong class="text-muted d-block mb-2">Room Qty</strong>
+                                <span class="progress-label">Room qty</span>
                                 <div class="progress progress-sm">
-                                    <div class="progress-bar bg-primary" role="progressbar" aria-valuenow="0"
-                                         aria-valuemin="0" aria-valuemax="0" style="width: 20%;">
-                                        <span class="progress-value"></span>
+                                    <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="20"
+                                         aria-valuemin="0" aria-valuemax="100" style="width: 0;">
+                                        <span id="roomTypeQtyPercent" class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
@@ -116,12 +124,31 @@
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
+                                                <date-picker @dp-change="dateDifference"
+                                                             placeholder="Booking for Days, From"
+                                                             :class="{ 'is-invalid': form.errors.has('booking_from') }"
+                                                             name="booking_from" v-model="form.booking_from"
+                                                             :config="options"></date-picker>
+                                                <has-error :form="form" field="booking_from"></has-error>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <date-picker @dp-change="dateDifference"
+                                                             placeholder="Booking for Days, To"
+                                                             :class="{ 'is-invalid': form.errors.has('booking_to') }"
+                                                             name="booking_to" v-model="form.booking_to"
+                                                             :config="options"></date-picker>
+                                                <has-error :form="form" field="booking_to"></has-error>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
                                                 <select class="form-control" v-model="form.room_type_id"
                                                         name="room_type_id" @change="changeRoomType($event)"
                                                         :class="{ 'is-invalid': form.errors.has('room_type_id') }">
                                                     <option value="" selected="" disabled>Choose Room Type</option>
                                                     <option v-for="roomType in roomTypes"
-                                                            v-bind:value="roomType.id">{{roomType.room_type}}
+                                                            v-bind:value="roomType.room_type_id">
+                                                        {{roomType.room_type.room_type}}
                                                     </option>
                                                 </select>
                                             </div>
@@ -197,24 +224,6 @@
                                                 <has-error :form="form" field="no_guest"></has-error>
                                             </div>
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-6">
-                                                <date-picker @dp-change="dateDifference"
-                                                             placeholder="Booking for Days, From"
-                                                             :class="{ 'is-invalid': form.errors.has('booking_from') }"
-                                                             name="booking_from" v-model="form.booking_from"
-                                                             :config="options"></date-picker>
-                                                <has-error :form="form" field="booking_from"></has-error>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <date-picker @dp-change="dateDifference"
-                                                             placeholder="Booking for Days, To"
-                                                             :class="{ 'is-invalid': form.errors.has('booking_to') }"
-                                                             name="booking_to" v-model="form.booking_to"
-                                                             :config="options"></date-picker>
-                                                <has-error :form="form" field="booking_to"></has-error>
-                                            </div>
-                                        </div>
                                         <hr>
                                         <div class="form-row">
                                             <div class="col mb-3">
@@ -284,8 +293,8 @@
                 payments: {},
                 roomTypes: {},
                 members: {},
-                roomTypesInfo: false,
                 memberFound: false,
+                roomTypesInfo: false,
                 roomImage: '',
                 roomInfo: {},
                 bookings: {},
@@ -316,7 +325,7 @@
         },
         methods: {
             loadRoomType() {
-                axios.get('api/room-type').then(({data}) => (this.roomTypes = data));
+                axios.get('api/room-info').then(({data}) => (this.roomTypes = data));
             },
             loadMember() {
                 this.$Progress.start()
@@ -335,29 +344,45 @@
             changeRoomType(event) {
                 this.$Progress.start()
                 axios.get('api/room-setup/' + event.target.value).then((data) => {
-                    if (data.data == "") {
-                        this.roomTypesInfo = false;
-                        setTimeout(function () {
-                            $('#roomTypeDetails').html('No search result found, you want to insert data click the below button.')
-                                .addClass('text-danger my-3').removeClass('text-muted');
-                            $('#roomTypeDetailsError').removeClass('d-none');
-                        }, 1000);
-                        this.$Progress.fail()
-                        this.form.room_rent = '';
-                        this.keyTotal();
-                    } else {
-                        this.$Progress.finish()
-                        axios.get('api/room-type-booking/' + event.target.value).then(({data}) => (this.bookings = data));
-                        this.roomInfo = data.data;
-                        this.form.room_rent = data.data.rent;
-                        this.roomTypesInfo = true;
-                        this.keyTotal();
-                    }
+                    axios.get('api/room-type-booking/' + event.target.value).then(({data}) => (this.bookings = data));
+                    this.roomInfo = data.data;
+                    this.form.room_rent = data.data.rent;
+                    this.roomTypesInfo = true;
+                    this.keyTotal();
+                    this.$Progress.finish()
+                    this.roomQty();
                 });
+            },
+            roomQty() {
+                if (this.form.booking_from != '' && this.form.booking_to != '' && this.form.room_type_id != '' && this.form.booking_from != null && this.form.booking_to != null) {
+                    this.$Progress.start()
+                    this.form.post('api/booking-room-free')
+                        .then((data) => {
+                            let roomTypeQtyBook = this.roomInfo.qty - data.data, percent;
+                            if (roomTypeQtyBook === 0) percent = '0'
+                            else percent = (roomTypeQtyBook / this.roomInfo.qty) * 100;
+                            $('#roomTypeQtyPercent').html(percent+'%');
+                            $('.progress-bar-striped').css('width',percent+'%');
+                            $('#roomTypeQtyBook').html(roomTypeQtyBook);
+                            $('#roomTypeQtyEmpty').html(data.data);
+                            this.$Progress.finish()
+                        })
+                        .catch(() => {
+                            this.$Progress.fail()
+                            swal("Failed!", 'There was something wrong.', 'warning')
+                        })
+                } else {
+                    setTimeout(() => {
+                        $('#roomTypeQtyPercent').html('0%');
+                        $('.progress-bar-striped').css('width','0%');
+                        $('#roomTypeQtyBook').html('0');
+                        $('#roomTypeQtyEmpty').html('0');
+                    }, 1000);
+                }
             },
             getMember: function () {
 
-                axios.get('api/member/'+this.form.member_id).then((data) => {
+                axios.get('api/member/' + this.form.member_id).then((data) => {
                     console.log(typeof data.data);
                     if (jQuery.isEmptyObject(data.data)) {
                         this.memberFound = true;
@@ -373,7 +398,6 @@
                         this.form.address = data.data.present_address;
                     }
                 });
-
 
 
                 //
@@ -398,6 +422,7 @@
                         this.form.reset();
                         this.form.clear();
                         this.loadBooking();
+                        this.roomTypesInfo = false;
                         this.$Progress.finish()
                     })
                     .catch(() => {
@@ -414,6 +439,7 @@
                 this.dateDifferences = moment.duration(moment(this.form.booking_to, 'DD/MM/YYYY', true)
                     .diff(moment(this.form.booking_from, 'DD/MM/YYYY', true))).asDays() + 1;
                 this.keyTotal();
+                this.roomQty();
 
             },
         },
